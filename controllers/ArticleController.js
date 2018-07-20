@@ -15,11 +15,12 @@ class ArticleController {
   // 文章详情  id
   static async detail (ctx) {
     const article = await Article.findById(ctx.params.id)
-    if(!Object.keys(article).length){
+    if(!article){
       ctx.body = {
         status: 0,
         msg: '文章不存在！'
       }
+      return
     }
     console.log(article)
     ctx.body = {
