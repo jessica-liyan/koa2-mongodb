@@ -4,7 +4,7 @@ const authCtrl = require('./UserController')
 
 class ArticleController {
   static async list (ctx) {
-    const articles = await Article.find()
+    const articles = await Article.find().sort({created_at: -1})
     ctx.body = {
       status: 1,
       msg: '文章列表获取成功！',
@@ -125,6 +125,42 @@ class ArticleController {
     console.log(log)
   }
 
+  //喜欢文章 文章id   token
+  static async like (ctx) {
+    const token = ctx.header.authorization
+    if(!token){
+      ctx.body = {
+        status: 0,
+        msg: 'token错误！'
+      }
+      return
+    }
+    // 喜欢该文章的用户
+    const user = authCtrl.getUserInfo(token)
+    const article = await Article.findById(ctx.params.id)
+
+    if(ctx.request.method === 'PUT'){
+      article.collectionCount = article.collectionCount + 1
+      await Log.create({
+        type: 'collection',
+        entry: {
+          uid: article._id,
+          title: article.title,
+          url: `http://localhost:8080/info/post/${article._id}`
+        },
+        userId: user._id
+      })
+    } else if(ctx.request.method === 'DELETE'){
+      article.collectionCount = article.collectionCount > 0 ? article.collectionCount - 1 : 0
+      await Log.deleteOne({
+        'entry.uid': article._id,
+        userId: user._id,
+        type: 'collection'
+      })
+    }
+    article.save()
+    ctx.body = article
+  }
 }
 
 module.exports = ArticleController

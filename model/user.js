@@ -22,6 +22,10 @@ const userSchema = new mongoose.Schema({
     type: Date, 
     default: Date.now
   },
+  collectedCount: {
+    type: Number,
+    default: 0
+  }
 })
 const User = mongoose.model('user', userSchema)
 

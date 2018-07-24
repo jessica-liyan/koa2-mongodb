@@ -43,10 +43,29 @@ class UserController {
       return
     }
     const user = UserController.getUserInfo(token)
-    const logs = await Log.find({userId: user._id})
+    const logs = await Log.find({userId: user._id}).sort({created_at: -1})
     ctx.body = {
       status: 1,
       msg: '用户日志获取成功！',
+      data: logs
+    }
+  }
+
+  // 我的喜欢 token
+  static async like (ctx) {
+    const token = ctx.header.authorization
+    if(!token){
+      ctx.body = {
+        status: 0,
+        msg: 'token错误！'
+      }
+      return
+    }
+    const user = UserController.getUserInfo(token)
+    const logs = await Log.find({userId: user._id, type: 'collection'}).sort({created_at: -1})
+    ctx.body = {
+      status: 1,
+      msg: '用户喜欢列表获取成功！',
       data: logs
     }
   }
@@ -62,7 +81,7 @@ class UserController {
       return
     }
     const user = UserController.getUserInfo(token)
-    const articles = await Article.find({author: user.name})
+    const articles = await Article.find({author: user.name}).sort({created_at: -1})
     ctx.body = {
       status: 1,
       msg: '该用户文章列表获取成功！',

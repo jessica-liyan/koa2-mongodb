@@ -18,6 +18,18 @@ const articleSchema = new mongoose.Schema({
   tag: {
     type: String,
   },
+  collectionCount: {
+    type: Number,
+    default: 0
+  },
+  commentsCount: {
+    type: Number,
+    default: 0
+  },
+  viewsCount: {
+    type: Number,
+    default: 0
+  },
   created_at: { 
     type: Date, 
     default: Date.now

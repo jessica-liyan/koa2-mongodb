@@ -14,6 +14,7 @@ router
   .get('/user/info', userctrl.info)
   .get('/user/post', userctrl.post)
   .get('/user/log', userctrl.log)
+  .get('/user/like', userctrl.like)
   .get('/captcha', captchactrl.fetch)
   .post('/upload', uploadctrl.upload)
   .get('/article', articlectrl.list)
@@ -21,5 +22,7 @@ router
   .post('/article/add', articlectrl.add)
   .post('/article/update', articlectrl.update)
   .get('/article/delete/:id', articlectrl.delete)
+  .put('/article/like/:id', articlectrl.like)
+  .delete('/article/like/:id', articlectrl.like)
 
 module.exports = router
