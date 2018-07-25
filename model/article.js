@@ -9,24 +9,27 @@ const articleSchema = new mongoose.Schema({
     required: true 
   },
   author: {
-    type: String,
+    type: Object,
     required: true 
   },
-  classify: {
-    type: String,
+  cover: { // 封面
+    type: String
+  },
+  classify: { // 分类
+    type: Object,
   },
   tag: {
     type: String,
   },
-  collectionCount: {
+  collectionCount: { // 喜欢量
     type: Number,
     default: 0
   },
-  commentsCount: {
+  commentsCount: { // 评论量
     type: Number,
     default: 0
   },
-  viewsCount: {
+  viewsCount: { // 阅读量
     type: Number,
     default: 0
   },

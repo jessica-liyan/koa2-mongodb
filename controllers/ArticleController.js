@@ -1,6 +1,6 @@
 const Article = require('../model/article')
 const Log = require('../model/log')
-const authCtrl = require('./UserController')
+const userCtrl = require('./UserController')
 
 class ArticleController {
   static async list (ctx) {
@@ -22,6 +22,9 @@ class ArticleController {
       }
       return
     }
+    // 文章每请求一次，阅读量加1
+    article.viewsCount = article.viewsCount + 1
+    article.save()
     console.log(article)
     ctx.body = {
       status: 1,
@@ -53,7 +56,7 @@ class ArticleController {
         title: article.title,
         url: `http://localhost:8080/info/post/${article._id}`
       },
-      userId: authCtrl.getUserInfo(token)._id
+      userId: userCtrl.getUserInfo(token)._id
     })
     console.log(log)
   }
@@ -91,7 +94,7 @@ class ArticleController {
         title: article.title,
         url: `http://localhost:8080/info/post/${article._id}`
       },
-      userId: authCtrl.getUserInfo(token)._id
+      userId: userCtrl.getUserInfo(token)._id
     })
     console.log(log)
   }
@@ -120,7 +123,7 @@ class ArticleController {
         title: article.title,
         url: `http://localhost:8080/info/post/${article._id}`
       },
-      userId: authCtrl.getUserInfo(token)._id
+      userId: userCtrl.getUserInfo(token)._id
     })
     console.log(log)
   }
@@ -136,7 +139,7 @@ class ArticleController {
       return
     }
     // 喜欢该文章的用户
-    const user = authCtrl.getUserInfo(token)
+    const user = userCtrl.getUserInfo(token)
     const article = await Article.findById(ctx.params.id)
 
     if(ctx.request.method === 'PUT'){
