@@ -5,6 +5,7 @@ const captchactrl = require('../controllers/CaptchaController')
 const uploadctrl = require('../controllers/UploadController') 
 const articlectrl = require('../controllers/ArticleController') 
 const commentctrl = require('../controllers/CommentController') 
+const friendctrl = require('../controllers/FriendController') 
 
 router
   .get('/', authctrl.test)
@@ -12,6 +13,7 @@ router
   .post('/login', authctrl.login)
   .get('/logout', authctrl.logout)
   .get('/user', userctrl.getSelf)
+  .post('/user/update', userctrl.update)
   .get('/user/:id', userctrl.info)
   .get('/user/:id/post', userctrl.post)
   .get('/user/:id/log', userctrl.log)
@@ -27,5 +29,9 @@ router
   .delete('/article/like/:id', articlectrl.like)
   .post('/comment', commentctrl.add)
   .get('/comment/:id', commentctrl.fetch)
+  .get('/follow', friendctrl.follow)
+  .get('/unfollow', friendctrl.unfollow)
+  .get('/followeeList', friendctrl.followeeList)
+  .get('/followerList', friendctrl.followerList)
 
 module.exports = router

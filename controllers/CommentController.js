@@ -24,9 +24,7 @@ class CommentController {
       content: ctx.request.body.content,
       parentId: ctx.request.body.parentId,
       userId: user._id, // 评论人
-      userInfo: user,
-      respUserId: article.author._id, // 原作者
-      respUserInfo: article.author,
+      userInfo: user
     })
     // article表的评论统计数加1
     article.commentsCount = article.commentsCount + 1

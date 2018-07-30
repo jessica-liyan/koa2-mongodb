@@ -1,14 +1,20 @@
 const Article = require('../model/article')
+const User = require('../model/user')
 const Log = require('../model/log')
 const userCtrl = require('./UserController')
 
 class ArticleController {
+  // 获取文章列表，分类
   static async list (ctx) {
     const articles = await Article.find().sort({created_at: -1})
+    let limit = ctx.query.limit || 20
+    let page = ctx.query.page || 1 // 页码，从1开始
     ctx.body = {
       status: 1,
       msg: '文章列表获取成功！',
-      data: articles
+      count: limit,
+      total: articles.length,
+      data: articles.splice((page - 1) * limit, limit)
     }
   }
 
@@ -25,7 +31,9 @@ class ArticleController {
     // 文章每请求一次，阅读量加1
     article.viewsCount = article.viewsCount + 1
     article.save()
-    console.log(article)
+    // 获取最新的作者信息
+    article.author = await User.findById(article.authorId)
+    article.save()
     ctx.body = {
       status: 1,
       msg: '文章获取成功！',
@@ -44,6 +52,9 @@ class ArticleController {
       return
     }
     const article = await Article.create(ctx.request.body)
+    // 补充作者信息
+    article.author = await User.findById(article.authorId)
+    article.save()
     ctx.body = {
       status: 1,
       msg: '文章添加成功！',
@@ -84,8 +95,7 @@ class ArticleController {
     Article.update({_id: ctx.request.body._id}, {$set: ctx.request.body}).exec()
     ctx.body = {
       status: 1,
-      msg: '文章更新成功！',
-      data: article
+      msg: '文章更新成功！'
     }
     const log = await Log.create({
       type: 'update',

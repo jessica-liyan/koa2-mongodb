@@ -8,9 +8,12 @@ const articleSchema = new mongoose.Schema({
     type: String,
     required: true 
   },
-  author: {
-    type: Object,
-    required: true 
+  authorId: { // 前台提交作者id
+    type: String,
+    required: true
+  },
+  author: { // 后台返回作者信息
+    type: Object
   },
   cover: { // 封面
     type: String

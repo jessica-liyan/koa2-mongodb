@@ -78,7 +78,7 @@ class UserController {
       }
       return
     }
-    const articles = await Article.find({'author._id': ctx.params.id}).sort({created_at: -1})
+    const articles = await Article.find({'authorId': ctx.params.id}).sort({created_at: -1})
     ctx.body = {
       status: 1,
       msg: '该用户文章列表获取成功！',
@@ -99,6 +99,31 @@ class UserController {
       status: 1,
       msg: 'success',
       data: UserController.getUserInfo(token)
+    }
+  }
+
+  // 更新用户资料 body token
+  static async update (ctx) {
+    const token = ctx.header.authorization
+    if(!token.length){
+      ctx.body = {
+        status: 0,
+        msg: 'token错误！'
+      }
+      return
+    }
+    const user = await User.findOne({_id: ctx.request.body._id})
+    if(!user){
+      ctx.body = {
+        status: 0,
+        msg: '用户不存在！'
+      }
+      return
+    }
+    User.update({_id: ctx.request.body._id}, {$set: ctx.request.body}).exec()
+    ctx.body = {
+      status: 1,
+      msg: '用户资料更新成功！'
     }
   }
 

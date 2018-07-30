@@ -16,17 +16,8 @@ const commentSchema = new mongoose.Schema({
     type: String,
     required: true 
   },
-  userInfo: {
+  userInfo: { // 评论人信息
     type: Object,
-    required: true 
-  },
-  respUserId: { // 被评论人的id
-    type: String,
-    required: true 
-  },
-  respUserInfo: {
-    type: Object,
-    required: true 
   },
   children: { // 子评论数组
     type: Array,
