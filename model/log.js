@@ -1,6 +1,6 @@
 const mongoose =  require('mongoose')
 const articleSchema = new mongoose.Schema({
-  type: { // collection(收藏)  follow(关注)   发表(add) 编辑(edit)  删除(del)   
+  type: { // 关注用户(follow)  文章发表(add)  文章更新(update)  喜欢文章(collection) 
     type: String,
     required: true 
   },

@@ -2,18 +2,21 @@ const mongoose =  require('mongoose')
 const userSchema = new mongoose.Schema({
   name: {
     type: String,
-    required: true
+    required: [true, '用户名不能为空！'],
   },
   password: {
     type: String,
-    required: true 
+    required: [true, '密码不能为空！'] 
   },
   email: {
     type: String,
-    required: true 
+    required: [true, '邮箱不能为空！'] 
   },
   avatar: {
     type: String,
+  },
+  token: {
+    type: String
   },
   job: { // 职位
     type: String

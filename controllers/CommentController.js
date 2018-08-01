@@ -1,30 +1,17 @@
-const userCtrl = require('./UserController')
 const Comment = require('../model/comment')
 const Article = require('../model/article')
 
 class CommentController {
-  // 发表评论  {文章id(targetId) parentId content}  token
-  static async add (ctx) {
-    const token = ctx.header.authorization
-    if(!token){
-      ctx.body = {
-        status: 0,
-        msg: 'token错误！'
-      }
-      return
-    }
-    // 评论者
-    const user = userCtrl.getUserInfo(token)
-    // 评论的文章
+  // 发表评论  /comment  {文章id(targetId) parentId content}  token
+  static async comment (ctx) {
     const article = await Article.findById(ctx.request.body.targetId)
 
-    // comments表新增一条记录
     const comment = await Comment.create({
       targetId: ctx.request.body.targetId,
       content: ctx.request.body.content,
       parentId: ctx.request.body.parentId,
-      userId: user._id, // 评论人
-      userInfo: user
+      userId: ctx.state.user._id, // 评论人
+      userInfo: ctx.state.user
     })
     // article表的评论统计数加1
     article.commentsCount = article.commentsCount + 1
@@ -37,16 +24,8 @@ class CommentController {
     }
   }
 
-  // 获取评论列表   params.id  token
+  // 获取评论列表 /comment/:id 
   static async fetch (ctx) {
-    const token = ctx.header.authorization
-    if(!token){
-      ctx.body = {
-        status: 0,
-        msg: 'token错误！'
-      }
-      return
-    }
     const comments = await Comment.find({targetId: ctx.params.id}).sort({created_at: -1})
     console.log('获取列表', getTrees(comments, ''))
     ctx.body = {

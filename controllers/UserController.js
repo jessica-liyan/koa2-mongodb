@@ -5,6 +5,7 @@ const Article = require('../model/article')
 const secret = require('../config').secret
 
 class UserController {
+  // 用户列表
   static async list (ctx) {
     const users = await User.find();
     ctx.body = {
@@ -14,16 +15,17 @@ class UserController {
     }
   }
 
-  // 我的资料 token
-  static async info (ctx) {
-    const token = ctx.header.authorization
-    if(!token){
-      ctx.body = {
-        status: 0,
-        msg: 'token错误！'
-      }
-      return
+  // 用户个人信息 /user  token
+  static getSelf (ctx) {
+    ctx.body = {
+      status: 1,
+      msg: 'success',
+      data: ctx.state.user
     }
+  }
+
+  // 我的资料 user/:id  token
+  static async info (ctx) {
     let user = await User.findById(ctx.params.id)
     ctx.body = {
       status: 1,
@@ -32,16 +34,8 @@ class UserController {
     }
   }
 
-  // 我的动态 token
+  // 我的动态 user/:id/log  token
   static async log (ctx) {
-    const token = ctx.header.authorization
-    if(!token){
-      ctx.body = {
-        status: 0,
-        msg: 'token错误！'
-      }
-      return
-    }
     const logs = await Log.find({userId: ctx.params.id}).sort({created_at: -1})
     ctx.body = {
       status: 1,
@@ -50,16 +44,8 @@ class UserController {
     }
   }
 
-  // 我的喜欢 token
+  // 我的喜欢 user/:id/like  token
   static async like (ctx) {
-    const token = ctx.header.authorization
-    if(!token){
-      ctx.body = {
-        status: 0,
-        msg: 'token错误！'
-      }
-      return
-    }
     const logs = await Log.find({userId: ctx.params.id, type: 'collection'}).sort({created_at: -1})
     ctx.body = {
       status: 1,
@@ -68,16 +54,8 @@ class UserController {
     }
   }
 
-  // 我的发布 token
+  // 我的发布 user/:id/post token
   static async post (ctx) {
-    const token = ctx.header.authorization
-    if(!token){
-      ctx.body = {
-        status: 0,
-        msg: 'token错误！'
-      }
-      return
-    }
     const articles = await Article.find({'authorId': ctx.params.id}).sort({created_at: -1})
     ctx.body = {
       status: 1,
@@ -86,32 +64,8 @@ class UserController {
     }
   }
 
-  static getSelf (ctx) {
-    const token = ctx.header.authorization
-    if(!token){
-      ctx.body = {
-        status: 0,
-        msg: 'token错误！'
-      }
-      return
-    }
-    ctx.body = {
-      status: 1,
-      msg: 'success',
-      data: UserController.getUserInfo(token)
-    }
-  }
-
-  // 更新用户资料 body token
+  // 更新用户资料 user/update   token
   static async update (ctx) {
-    const token = ctx.header.authorization
-    if(!token.length){
-      ctx.body = {
-        status: 0,
-        msg: 'token错误！'
-      }
-      return
-    }
     const user = await User.findOne({_id: ctx.request.body._id})
     if(!user){
       ctx.body = {
@@ -128,7 +82,7 @@ class UserController {
   }
 
   static getUserInfo (token) {
-    return jsonwebtoken.verify(token.split(' ')[1], secret).data
+    return jsonwebtoken.verify(token, secret).data
   }
 }
 

@@ -3,17 +3,9 @@ const Log = require('../model/log')
 const Friend = require('../model/friend')
 
 class FriendController {
-  // 我的关注列表  id, token
+  // 我的关注列表 /followeeList/id   token
   static async followeeList (ctx) {
-    const token = ctx.header.authorization
-    if(!token){
-      ctx.body = {
-        status: 0,
-        msg: 'token错误！'
-      }
-      return
-    }
-    const friends = await Friend.find({followerId: ctx.query.id})
+    const friends = await Friend.find({followerId: ctx.params.id})
     ctx.body = {
       status: 1,
       msg: '关注用户列表成功！',
@@ -21,17 +13,9 @@ class FriendController {
     }
   }
 
-  // 我的粉丝列表 id, token
+  // 我的粉丝列表 /followerList/id    token
   static async followerList (ctx) {
-    const token = ctx.header.authorization
-    if(!token){
-      ctx.body = {
-        status: 0,
-        msg: 'token错误！'
-      }
-      return
-    }
-    const friends = await Friend.find({followeeId: ctx.query.id})
+    const friends = await Friend.find({followeeId: ctx.params.id})
     ctx.body = {
       status: 1,
       msg: '粉丝列表成功！',
@@ -39,16 +23,33 @@ class FriendController {
     }
   }
 
-  // 添加关注  followeeId   followerId(userId)  token
-  static async follow (ctx) {
-    const token = ctx.header.authorization
-    if(!token){
+  // 判断是否有关注关系 /isFollowed?followeeId & followerId   token
+  static async isFollowed (ctx) {
+    const friend = await Friend.findOne({ // 返回的是单个对象或null
+      followeeId: ctx.query.followeeId,
+      followerId: ctx.query.followerId
+    });
+    if(friend){
       ctx.body = {
-        status: 0,
-        msg: 'token错误！'
+        status: 1,
+        msg: 'ok',
+        data: {
+          isFollowed: true
+        }
       }
-      return
+    } else {
+      ctx.body = {
+        status: 1,
+        msg: 'ok',
+        data: {
+          isFollowed: false
+        }
+      }
     }
+  }
+
+  // 添加关注  /follow?followeeId & followerId(userId)   token
+  static async follow (ctx) {
     const follower = await User.findById(ctx.query.followerId) // 粉丝
     const followee = await User.findById(ctx.query.followeeId) // 被关注人
     follower.followeesCount = follower.followeesCount + 1
@@ -77,16 +78,8 @@ class FriendController {
     }
   }
 
-  // 取消关注  followeeId(userId)   followerId  token
+  // 取消关注  /unfollow ? followeeId(userId) & followerId   token
   static async unfollow (ctx) {
-    const token = ctx.header.authorization
-    if(!token){
-      ctx.body = {
-        status: 0,
-        msg: 'token错误！'
-      }
-      return
-    }
     const follower = await User.findById(ctx.query.followerId) // 粉丝
     const followee = await User.findById(ctx.query.followeeId) // 被关注人
     follower.followeesCount = follower.followeesCount > 1 ? follower.followeesCount - 1 : 0

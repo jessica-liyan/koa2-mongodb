@@ -49,36 +49,32 @@ app.use(session({
   key: "SESSIONID"
 }));
 
-// 
-app.use(async (ctx, next) => {
-  try {
-    await next();
-  } catch (err) {
-    console.log('错误啦', err)
-    ctx.status = err.status || 500;
-    ctx.body = {
-      status: 0,
-      msg: err.message
-    };
-    ctx.app.emit('error', err, ctx);
-    if (err.status === 401) {
-      ctx.status = 401;
-      ctx.body = {
-        status: 0,
-        error: err.originalError ? err.originalError.message : err.message,
-      };
-    } else {
-      throw err;
-    }
-  }
-});
+// 鉴权
+const passport = require('koa-passport')
+app.use(passport.initialize())
+app.use(passport.session())
 
 // routes
 app.use(index.routes(), index.allowedMethods())
 
+app.use(async (ctx, next) => {
+  try {
+    await next();
+  } catch (err) {
+    console.log('错误啦', err.errors, err.message)
+    // ctx.response.status = err.statusCode || err.status || 500;
+    // validationError
+    ctx.response.body = {
+      status: 0,
+      data: err.errors,
+      msg: err.message
+    };
+  }
+});
+
 // error-handling
 app.on('error', (err, ctx) => {
-  console.error('server error', err, ctx)
+  //console.error('server error', err, ctx)
 });
 
 module.exports = app

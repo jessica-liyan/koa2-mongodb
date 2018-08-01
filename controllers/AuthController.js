@@ -9,10 +9,7 @@ class AuthController {
   }
 
   static async register(ctx) {
-    // 验证码比对
-    console.log('验证码', ctx.session)
     const params = ctx.request.body
-    console.log(params)
     const user = await User.create({
       name: params.name,
       password: params.password,
@@ -43,8 +40,11 @@ class AuthController {
     if (checkPass) {
       const token = jsonwebtoken.sign({
         data: user,
-        exp: Math.floor(Date.now() / 1000) + (60 * 60) // 1小时之后过期
+        exp: Math.floor(Date.now() / 1000) + (60*60) // 1小时之后过期
       }, secret)
+      user.token = token
+      user.save()
+
       ctx.body = {
         status: 1,
         msg: '登录成功！',
@@ -60,11 +60,11 @@ class AuthController {
   }
 
   static async logout (ctx) {
-    // 重新生成token
-    const token = jsonwebtoken.sign({
-      data: {name: 'liyan'},
-      exp: 10
-    }, secret)
+    // 清除数据库中的token
+    const user = ctx.state.user
+    user.token = ''
+    user.save()
+
     ctx.body = {
       status: 1,
       msg: '成功退出！'
