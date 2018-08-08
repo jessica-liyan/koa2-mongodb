@@ -9,6 +9,7 @@
     "test": "echo \"Error: no test specified\" && exit 1"
   },
   "dependencies": {
+    "async": "^2.6.1",
     "bcrypt": "^3.0.0",
     "captchapng": "^0.0.1",
     "debug": "^2.6.3",
@@ -24,6 +25,7 @@
     "koa-passport": "^4.1.0",
     "koa-router": "^7.1.1",
     "koa-session2": "^2.2.6",
+    "koa-socket": "^4.4.0",
     "koa-static": "^3.0.0",
     "koa-views": "^5.2.1",
     "koa2-cors": "^2.0.5",

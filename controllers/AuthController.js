@@ -5,11 +5,34 @@ const secret = require('../config').secret
 
 class AuthController {
   static async test (ctx) {
-    ctx.body = 'hello'
+    ctx.body = '什么鬼'
   }
 
+  // 注册
   static async register(ctx) {
     const params = ctx.request.body
+
+    const hasEmail = await User.findOne({
+      email: params.email
+    })
+    const hasName = await User.findOne({
+      name: params.name
+    })
+    if(hasEmail){
+      ctx.body = {
+        status: 0,
+        msg: '邮箱已经被注册！'
+      }
+      return
+    }
+    if(hasName){
+      ctx.body = {
+        status: 0,
+        msg: '用户名已经被注册！'
+      }
+      return
+    }
+
     const user = await User.create({
       name: params.name,
       password: params.password,

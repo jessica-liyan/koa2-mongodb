@@ -1,5 +1,6 @@
 const Comment = require('../model/comment')
 const Article = require('../model/article')
+const Log = require('../model/log')
 
 class CommentController {
   // 发表评论  /comment  {文章id(targetId) parentId content}  token
@@ -10,12 +11,23 @@ class CommentController {
       targetId: ctx.request.body.targetId,
       content: ctx.request.body.content,
       parentId: ctx.request.body.parentId,
-      userId: ctx.state.user._id, // 评论人
-      userInfo: ctx.state.user
+      user: ctx.state.user._id, // 评论人
     })
     // article表的评论统计数加1
     article.commentsCount = article.commentsCount + 1
     article.save()
+
+    await Log.create({
+      type: 'comment',
+      entry: {
+        uid: article._id,
+        title: article.title,
+        author: article.author,
+        url: `http://localhost:8080/info/post/${article._id}`
+      },
+      comment: comment,
+      user: ctx.state.user._id
+    })
 
     ctx.body = {
       status: 1,
@@ -26,8 +38,7 @@ class CommentController {
 
   // 获取评论列表 /comment/:id 
   static async fetch (ctx) {
-    const comments = await Comment.find({targetId: ctx.params.id}).sort({created_at: -1})
-    console.log('获取列表', getTrees(comments, ''))
+    const comments = await Comment.find({targetId: ctx.params.id}).populate({ path: 'user'}).sort({created_at: -1})
     ctx.body = {
       status: 1,
       msg: 'success',

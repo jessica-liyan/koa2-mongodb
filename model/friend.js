@@ -1,18 +1,14 @@
 const mongoose =  require('mongoose')
 const friendSchema = new mongoose.Schema({
-  followeeId: { // 被关注方
+  followee: { // 被关注方
     type: String,
-    required: true 
+    required: true,
+    ref: 'user'
   },
-  followee: { // 被关注方的信息
-    type: Object,
-  },
-  followerId: {  // 粉丝
+  follower: {  // 粉丝
     type: String,
-    required: true 
-  },
-  follower: { // 粉丝信息
-    type: Object,
+    required: true,
+    ref: 'user'
   },
   created_at: { 
     type: Date, 

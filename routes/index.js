@@ -6,11 +6,12 @@ const uploadctrl = require('../controllers/UploadController')
 const articlectrl = require('../controllers/ArticleController') 
 const commentctrl = require('../controllers/CommentController') 
 const friendctrl = require('../controllers/FriendController') 
+const msgctrl = require('../controllers/MessageController') 
 
 const {isAuthenticated} = require('../config/passport')
 
 router
-  .get('/', isAuthenticated(), authctrl.test) // 测试
+  .get('/', authctrl.test) // 测试
   .post('/register', authctrl.register)
   .post('/login', authctrl.login)
   .get('/captcha', captchactrl.fetch)
@@ -23,8 +24,11 @@ router
   .get('/user/:id/post', isAuthenticated(), userctrl.post)
   .get('/user/:id/log', isAuthenticated(), userctrl.log)
   .get('/user/:id/like', isAuthenticated(), userctrl.like)
+  .get('/notification/:id', isAuthenticated(), userctrl.notification)
+  .get('/getNotificationNum/:id', isAuthenticated(), userctrl.getNotificationNum)
   .get('/article', articlectrl.list)
-  .get('/article/:id', articlectrl.detail)
+  .get('/article/:type', articlectrl.list)
+  .get('/article/detail/:id', articlectrl.detail)
   .post('/article/add', isAuthenticated(), articlectrl.add)
   .post('/article/update', isAuthenticated(), articlectrl.update)
   .get('/article/delete/:id', isAuthenticated(), articlectrl.delete)
@@ -37,5 +41,8 @@ router
   .get('/followeeList/:id', isAuthenticated(), friendctrl.followeeList)
   .get('/followerList/:id', isAuthenticated(), friendctrl.followerList)
   .get('/isFollowed', isAuthenticated(), friendctrl.isFollowed)
+  .post('/message', isAuthenticated(), msgctrl.send)
+  .post('/message/list', isAuthenticated(), msgctrl.list)
+  .get('/message/:id', isAuthenticated(), msgctrl.friends)
 
 module.exports = router

@@ -3,23 +3,35 @@ const User = require('../model/user')
 const Log = require('../model/log')
 
 class ArticleController {
-  // 获取文章列表，分类  /article  ?page=0&limit=4
+  // 获取文章列表，分类 /article  /article/:type ?page=0&limit=4
   static async list (ctx) {
-    const articles = await Article.find().sort({created_at: -1})
-    let limit = ctx.query.limit || 20  // 每页条数
-    let page = ctx.query.page || 1 // 页码，从1开始
+    let articles
+    let total
+    if(ctx.params.type){
+      articles = await Article.find({'classify.title': ctx.params.type}).populate({ path: 'author'}).sort({created_at: -1})
+      total = articles.length
+    }else{
+      articles = await Article.find({}).populate({ path: 'author'}).sort({created_at: -1})
+      total = articles.length
+    }
+    
+    let limit = Number(ctx.query.limit) || 20  // 每页条数
+    let page = Number(ctx.query.page) || 1 // 页码，从1开始
+    articles = articles.splice((page - 1) * limit, limit)
+
     ctx.body = {
       status: 1,
       msg: '文章列表获取成功！',
-      count: limit,
-      total: articles.length,
-      data: articles.splice((page - 1) * limit, limit)
+      total: total, // 总条数
+      data: articles,
+      page: page, // 当前页数
+      limit: limit // 每页条数
     }
   }
 
-  // 文章详情  /article/:id
+  // 文章详情  /article/detail/:id
   static async detail (ctx) {
-    const article = await Article.findById(ctx.params.id)
+    const article = await Article.findById(ctx.params.id).populate({ path: 'author'})
     if(!article){
       ctx.body = {
         status: 0,
@@ -30,9 +42,7 @@ class ArticleController {
     // 文章每请求一次，阅读量加1
     article.viewsCount = article.viewsCount + 1
     article.save()
-    // 获取最新的作者信息
-    article.author = await User.findById(article.authorId)
-    article.save()
+
     ctx.body = {
       status: 1,
       msg: '文章获取成功！',
@@ -43,9 +53,7 @@ class ArticleController {
   // 发布文章 /article/add  body token
   static async add (ctx) {
     const article = await Article.create(ctx.request.body)
-    // 补充作者信息
-    article.author = await User.findById(article.authorId)
-    article.save()
+
     ctx.body = {
       status: 1,
       msg: '文章添加成功！',
@@ -57,9 +65,10 @@ class ArticleController {
       entry: {
         uid: article._id,
         title: article.title,
+        author: article.author,
         url: `http://localhost:8080/info/post/${article._id}`
       },
-      userId: ctx.state.user._id
+      user: ctx.state.user._id
     })
   }
 
@@ -86,9 +95,10 @@ class ArticleController {
       entry: {
         uid: article._id,
         title: article.title,
+        author: article.author,
         url: `http://localhost:8080/info/post/${article._id}`
       },
-      userId: ctx.state.user._id
+      user: ctx.state.user._id
     })
   }
 
@@ -117,9 +127,10 @@ class ArticleController {
         entry: {
           uid: article._id,
           title: article.title,
+          author: article.author,
           url: `http://localhost:8080/info/post/${article._id}`
         },
-        userId: ctx.state.user._id
+        user: ctx.state.user._id
       })
     } else if(ctx.request.method === 'DELETE'){
       // 文章被喜欢字段-1
@@ -128,7 +139,7 @@ class ArticleController {
       // 删除对应日志
       await Log.deleteOne({
         'entry.uid': article._id,
-        userId: ctx.state.user._id,
+        user: ctx.state.user._id,
         type: 'collection'
       })
     }

@@ -12,12 +12,10 @@ const commentSchema = new mongoose.Schema({
     type: String,
     default: ''
   },
-  userId: { // 评论人的id
+  user: { // 评论人的id
     type: String,
-    required: true 
-  },
-  userInfo: { // 评论人信息
-    type: Object,
+    required: true,
+    ref: 'user' // 表示关联user表
   },
   children: { // 子评论数组
     type: Array,

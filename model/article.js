@@ -8,12 +8,10 @@ const articleSchema = new mongoose.Schema({
     type: String,
     required: true 
   },
-  authorId: { // 前台提交作者id
+  author: { // 前台提交作者id
     type: String,
-    required: true
-  },
-  author: { // 后台返回作者信息
-    type: Object
+    required: true,
+    ref: 'user' // 表示关联user表
   },
   cover: { // 封面
     type: String

@@ -5,7 +5,7 @@ const Friend = require('../model/friend')
 class FriendController {
   // 我的关注列表 /followeeList/id   token
   static async followeeList (ctx) {
-    const friends = await Friend.find({followerId: ctx.params.id})
+    const friends = await Friend.find({follower: ctx.params.id}).populate({ path: 'followee'})
     ctx.body = {
       status: 1,
       msg: '关注用户列表成功！',
@@ -15,7 +15,7 @@ class FriendController {
 
   // 我的粉丝列表 /followerList/id    token
   static async followerList (ctx) {
-    const friends = await Friend.find({followeeId: ctx.params.id})
+    const friends = await Friend.find({followee: ctx.params.id}).populate({ path: 'follower'})
     ctx.body = {
       status: 1,
       msg: '粉丝列表成功！',
@@ -26,8 +26,8 @@ class FriendController {
   // 判断是否有关注关系 /isFollowed?followeeId & followerId   token
   static async isFollowed (ctx) {
     const friend = await Friend.findOne({ // 返回的是单个对象或null
-      followeeId: ctx.query.followeeId,
-      followerId: ctx.query.followerId
+      followee: ctx.query.followeeId,
+      follower: ctx.query.followerId
     });
     if(friend){
       ctx.body = {
@@ -58,17 +58,14 @@ class FriendController {
     followee.save()
 
     const friend = await Friend.create({
-      followeeId: ctx.query.followeeId,
-      followerId: ctx.query.followerId
+      followee: ctx.query.followeeId,
+      follower: ctx.query.followerId
     });
-    friend.follower = follower
-    friend.followee = followee
-    friend.save()
 
     await Log.create({
       type: 'follow',
-      userId: ctx.query.followerId,
-      users: followee
+      user: ctx.query.followerId, // 操作用户
+      followee: ctx.query.followeeId // 被关注的用户
     })
 
     ctx.body = {
@@ -88,8 +85,8 @@ class FriendController {
     followee.save()
 
     await Friend.deleteOne({
-      followeeId: ctx.query.followeeId,
-      followerId: ctx.query.followerId
+      followee: ctx.query.followeeId,
+      follower: ctx.query.followerId
     })
     ctx.body = {
       status: 1,

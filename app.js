@@ -1,5 +1,5 @@
 const Koa = require('koa')
-const app = new Koa()
+const IO = require('koa-socket')
 const views = require('koa-views')
 const json = require('koa-json')
 const onerror = require('koa-onerror')
@@ -10,6 +10,10 @@ const config = require('./config')
 const session = require('koa-session2')
 
 const index = require('./routes/index')
+
+const app = new Koa()
+const io = new IO()
+io.attach(app)
 
 // error handler
 onerror(app)
