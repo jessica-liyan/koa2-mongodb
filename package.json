@@ -12,6 +12,7 @@
     "async": "^2.6.1",
     "bcrypt": "^3.0.0",
     "captchapng": "^0.0.1",
+    "co": "^4.6.0",
     "debug": "^2.6.3",
     "jsonwebtoken": "^8.3.0",
     "koa": "^2.2.0",

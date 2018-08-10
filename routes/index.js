@@ -18,7 +18,7 @@ router
   .post('/upload', uploadctrl.upload)
   .get('/logout', isAuthenticated(), authctrl.logout)
   .get('/user', isAuthenticated(), userctrl.getSelf)
-  .get('/user/list', isAuthenticated(), userctrl.list)
+  .get('/user/list', userctrl.list)
   .post('/user/update', isAuthenticated(),userctrl.update)
   .get('/user/:id', isAuthenticated(), userctrl.info)
   .get('/user/:id/post', isAuthenticated(), userctrl.post)
@@ -41,8 +41,7 @@ router
   .get('/followeeList/:id', isAuthenticated(), friendctrl.followeeList)
   .get('/followerList/:id', isAuthenticated(), friendctrl.followerList)
   .get('/isFollowed', isAuthenticated(), friendctrl.isFollowed)
-  .post('/message', isAuthenticated(), msgctrl.send)
-  .post('/message/list', isAuthenticated(), msgctrl.list)
-  .get('/message/:id', isAuthenticated(), msgctrl.friends)
+  .post('/message/list', isAuthenticated(), msgctrl.messageList)
+  .get('/group', isAuthenticated(), msgctrl.groupList)
 
 module.exports = router

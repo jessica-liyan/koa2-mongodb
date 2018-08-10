@@ -5,7 +5,7 @@ const secret = require('../config').secret
 
 class AuthController {
   static async test (ctx) {
-    ctx.body = '什么鬼'
+    ctx.body = 'hello'
   }
 
   // 注册
@@ -63,7 +63,7 @@ class AuthController {
     if (checkPass) {
       const token = jsonwebtoken.sign({
         data: user,
-        exp: Math.floor(Date.now() / 1000) + (60*60) // 1小时之后过期
+        exp: Math.floor(Date.now() / 1000) + (60*60*5) // 5小时之后过期
       }, secret)
       user.token = token
       user.save()
