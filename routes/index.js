@@ -43,5 +43,7 @@ router
   .get('/isFollowed', isAuthenticated(), friendctrl.isFollowed)
   .post('/message/list', isAuthenticated(), msgctrl.messageList)
   .get('/group', isAuthenticated(), msgctrl.groupList)
+  .post('/group/add', isAuthenticated(), msgctrl.createGroup)
+  .get('/group/:id', isAuthenticated(), msgctrl.groupInfo)
 
 module.exports = router

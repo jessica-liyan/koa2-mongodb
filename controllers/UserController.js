@@ -8,7 +8,7 @@ const secret = require('../config').secret
 class UserController {
   // 用户列表
   static async list (ctx) {
-    const users = await User.find();
+    const users = await User.find({}, 'name avatar');
     ctx.body = {
       status: 1,
       msg: '获取用户列表成功！',

@@ -9,6 +9,10 @@ const GroupSchema = new Schema({
   },
   avatar: {
     type: String,
+    default: 'images/201807233eb5pgnzo3p.png'
+  },
+  desc: {
+    type: String,
   },
   creator: {
     type: String,

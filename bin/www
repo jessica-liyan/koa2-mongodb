@@ -31,19 +31,12 @@ var io = socketIo(server)
 var User = require('../model/user')
 var Socket = require('../model/socket')
 var Message = require('../model/message')
+var Group = require('../model/group')
 var roomInfo = {} // {id: [user1, user2]}
 var count = 0;
 
 io.on('connection', async (socket) => { 
   console.log('客户端接入',socket.id , socket.request.connection.remoteAddress)
-  console.log('头部信息', socket.request.headers.referer)
-
-  // var url = socket.request.headers.referer;
-  // var splited = url.split('/');
-  // var roomID = splited[splited.length - 1];
-  // console.log('roomID', roomID)
-
-  let roomID = 'room' + (++count)
   
   socket.on('updateUserSocket', async (userId) => {
     const user = await Socket.findOne({user: userId})
@@ -67,22 +60,26 @@ io.on('connection', async (socket) => {
     // 广播
     const sendMsg = await Message.findById(msg._id).populate({path: 'from', select: 'name avatar'})
     const target = await Socket.findOne({user: params.to})
-    io.to(target.id).emit('getNewMessage', sendMsg)
+
+    if(params.type === 'text'){
+      io.to(target.id).emit('getNewMessage', sendMsg)
+    } else {
+      io.to(params.to).emit('getNewMessage', sendMsg)
+    }
+     
   })
 
   // 新用户加入房间
-  socket.on('join', (user) => { // 每个连接用户创建一个房间
-    if(!roomInfo[roomID]){
-      roomInfo[roomID] = []
-    }
-    roomInfo[roomID].push(user)
+  socket.on('join', async (userId) => { // 每个连接用户创建一个房间
+    console.log('join开房啦', userId)
 
-    socket.join(roomID, () => {
-      let rooms = Object.keys(socket.rooms)
-      console.log(`${user.name}加入了房间${rooms}`)
-      console.log('房间信息', io.sockets.manager)
-      io.to(roomID).emit('sys', `${user.name}加入了房间`);
-    });
+    const user = await User.findById(userId)
+    const group = await Group.find({members: userId})
+    group.map((item) => {
+      socket.join(item._id)
+      io.to(item._id).emit('groupSys', `${user.name}加入了房间${item._id}`)
+    })
+    
   })
 
   // 查找某好友是否在线
